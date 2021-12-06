@@ -64,7 +64,7 @@ func get_overlap(vent_lines []vent_line, max_x int, max_y int, part1 bool) int {
 		}
 		current := vl.origin
 		for i := 0; i < vl.len; i++ {
-			vent_grid[current.x][current.y] += 1
+			vent_grid[current.x][current.y]++
 			current.x += vl.dir.x
 			current.y += vl.dir.y
 		}
