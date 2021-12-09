@@ -51,7 +51,7 @@ func main() {
 	}
 	fmt.Println(deviation)
 	min_deviation := -1
-	//min_dev_pos := 0
+	min_dev_pos := 0
 	for i := 0; i < m; i++ {
 		other_deviation := 0
 		for _, pos := range positions {
@@ -59,8 +59,10 @@ func main() {
 		}
 		if min_deviation == -1 || other_deviation < min_deviation {
 			min_deviation = other_deviation
-			//min_dev_pos = i
+			min_dev_pos = i
 		}
 	}
 	fmt.Println(min_deviation)
+	fmt.Println(min_dev_pos)
+
 }
