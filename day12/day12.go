@@ -7,27 +7,6 @@ import (
 	"unicode"
 )
 
-func count_paths(edges map[string]map[string]bool, visited map[string]bool, current string) int {
-	if current == "end" {
-		return 1
-	}
-	_, already_visited := visited[current]
-	if already_visited && unicode.IsLower(rune(current[0])) {
-		return 0
-	}
-	new_visited := make(map[string]bool)
-	for k, v := range visited {
-		new_visited[k] = v
-	}
-	new_visited[current] = true
-
-	path_sum := 0
-	for node := range edges[current] {
-		path_sum += count_paths(edges, new_visited, node)
-	}
-	return path_sum
-}
-
 func count_paths_part2(edges map[string]map[string]bool, visited map[string]bool, current string, has_visited_twice bool) int {
 	if current == "end" {
 		return 1
@@ -77,7 +56,7 @@ func main() {
 		edges[edge[1]][edge[0]] = true
 	}
 	visited := map[string]bool{}
-	fmt.Println(count_paths(edges, visited, "start"))
+	fmt.Println(count_paths_part2(edges, visited, "start", true))
 	fmt.Println(count_paths_part2(edges, visited, "start", false))
 
 }
