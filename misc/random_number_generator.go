@@ -56,6 +56,44 @@ func main() {
 		rs_split := strings.Split(string(rs), " -> ")
 		rules[rs_split[0]] = rs_split[1]
 	}
+
+	//initial naive implementation
+	template := orig_template
+	for i := 0; i < 10; i++ {
+		next_template := ""
+		for j := 0; j < len(template)-1; j++ {
+			val, ok := rules[template[j:j+2]]
+			next_template += string(template[j])
+			if ok {
+				next_template += val
+			}
+		}
+		next_template += string(template[len(template)-1])
+		template = next_template
+	}
+
+	frequencies := make(map[string]int)
+	for _, char := range template {
+		_, ok := frequencies[string(char)]
+		if ok {
+			frequencies[string(char)]++
+		} else {
+			frequencies[string(char)] = 1
+		}
+	}
+
+	mf_char := string(template[0])
+	lf_char := string(template[0])
+
+	for char, count := range frequencies {
+		if count > frequencies[mf_char] {
+			mf_char = char
+		}
+		if count < frequencies[lf_char] {
+			lf_char = char
+		}
+	}
+
 	//better implementation
 	cached_frequencies := make([]map[string]map[string]int, 40)
 	for i := 0; i < 40; i++ {
@@ -75,16 +113,16 @@ func main() {
 	}
 	final_counts[string(orig_template[len(orig_template)-1])]++
 
-	mf_char := string(orig_template[0])
-	lf_char := string(orig_template[0])
+	mf_char = string(orig_template[0])
+	lf_char = string(orig_template[0])
 
 	for char, count := range final_counts {
-		if count > final_counts[mf_char] {
+		if count > frequencies[mf_char] {
 			mf_char = char
 		}
-		if count < final_counts[lf_char] {
+		if count < frequencies[lf_char] {
 			lf_char = char
 		}
 	}
-	fmt.Println(final_counts[mf_char] - final_counts[lf_char])
+	fmt.Println(frequencies[mf_char] - frequencies[lf_char])
 }
