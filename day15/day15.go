@@ -75,7 +75,7 @@ func dijkstra(cave [][]int) int {
 
 	//for each vertex v in Graph:
 	for i, row := range cave {
-		for j, _ := range row {
+		for j := range row {
 			//dist[v] ← INFINITY
 			//add v to Q
 			uc := &unvisitedCoord{coord{i, j}, 1000000, i*len(row) + j}
@@ -132,7 +132,7 @@ func main() {
 	fmt.Println(dijkstra(cave))
 	//cave = [][]int{{1,2,3},{4,5,6},{7,8,9}}
 	large_cave := make([][]int, len(cave)*5)
-	for i, _ := range large_cave {
+	for i := range large_cave {
 		large_cave[i] = make([]int, len(cave[0])*5)
 	}
 	for k := 0; k < 5; k++ {
