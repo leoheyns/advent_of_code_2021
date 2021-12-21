@@ -44,6 +44,7 @@ func permutateCloud(cloud map[coordinate]bool, x_axis int, y_axis int, x_sign in
 		case 2:
 			new_coord.z = coord.x * x_sign
 		}
+
 		switch y_axis {
 		case 0:
 			new_coord.x = coord.y * y_sign
@@ -86,26 +87,6 @@ func generatePossibleClouds(cloud map[coordinate]bool) []map[coordinate]bool {
 	return result
 }
 
-func checkOverlapAtOffset(cloud1 map[coordinate]bool, cloud2 map[coordinate]bool, offset coordinate) int {
-	overlap_count := 0
-	for point := range cloud2 {
-		offsetPoint := coordinate{
-			x: point.x + offset.x,
-			y: point.y + offset.y,
-			z: point.z + offset.z,
-		}
-		if offsetPoint.x <= 1000 && offsetPoint.x >= -1000 && offsetPoint.y <= 1000 && offsetPoint.y >= -1000 && offsetPoint.z <= 1000 && offsetPoint.z >= -1000 {
-			_, ok := cloud1[offsetPoint]
-			if ok {
-				overlap_count++
-			} else {
-				break
-			}
-		}
-	}
-	return overlap_count
-}
-
 func checkOverlap(cloud1 map[coordinate]bool, cloud2 map[coordinate]bool) (bool, coordinate) {
 	for anchor1 := range cloud1 {
 		for anchor2 := range cloud2 {
@@ -115,12 +96,6 @@ func checkOverlap(cloud1 map[coordinate]bool, cloud2 map[coordinate]bool) (bool,
 				z: anchor1.z - anchor2.z,
 			}
 
-			//opositeOffset := coordinate{
-			//	x: anchor2.x - anchor1.x,
-			//	y: anchor2.y - anchor1.y,
-			//	z: anchor2.z - anchor1.z,
-			//}
-
 			overlap_count := 0
 			for point := range cloud2 {
 				offsetPoint := coordinate{
@@ -128,46 +103,19 @@ func checkOverlap(cloud1 map[coordinate]bool, cloud2 map[coordinate]bool) (bool,
 					y: point.y + offset.y,
 					z: point.z + offset.z,
 				}
-				//volgens het verhaaltje is deze check niet eens nodig volgens mij
-				if offsetPoint.x <= 1000 && offsetPoint.x >= -1000 && offsetPoint.y <= 1000 && offsetPoint.y >= -1000 && offsetPoint.z <= 1000 && offsetPoint.z >= -1000 {
-					_, ok := cloud1[offsetPoint]
-					if ok {
-						overlap_count++
-					} else {
-						break
-					}
+				_, ok := cloud1[offsetPoint]
+				if ok {
+					overlap_count++
+				} else {
+					break
 				}
 			}
-			//
-			//for point := range cloud1{
-			//	offsetPoint := coordinate{
-			//		x: point.x + opositeOffset.x,
-			//		y: point.y + opositeOffset.y,
-			//		z: point.z + opositeOffset.z,
-			//	}
-			//	if offsetPoint.x <= 1000 && offsetPoint.x >= -1000 &&  offsetPoint.y <= 1000 && offsetPoint.y >= -1000 &&  offsetPoint.z <= 1000 && offsetPoint.z >= -1000{
-			//		_,ok := cloud2[offsetPoint]
-			//		if !ok{
-			//			break
-			//		}
-			//	}
-			//}
 			if overlap_count >= 12 {
 				return true, offset
 			}
 		}
 	}
 	return false, coordinate{}
-}
-
-func cloudEquals(c1 map[coordinate]bool, c2 map[coordinate]bool) bool {
-	for point := range c1 {
-		_, ok := c2[point]
-		if !ok {
-			return false
-		}
-	}
-	return true
 }
 
 func resultPointCloud(pointClouds []*map[coordinate]bool) (map[coordinate]bool, map[*map[coordinate]bool]coordinate) {
@@ -189,10 +137,9 @@ func resultPointCloud(pointClouds []*map[coordinate]bool) (map[coordinate]bool, 
 		currentReferenceScanner := queue[0]
 		queue = queue[1:]
 
-		for i, cloud := range pointClouds {
+		for _, cloud := range pointClouds {
 			_, ok := added[cloud]
 			if !ok {
-
 				var cloudRotated map[coordinate]bool
 				for _, cloudPerm := range generatePossibleClouds(*cloud) {
 					overlaps, offset := checkOverlap(*currentReferenceScanner, cloudPerm)
@@ -206,7 +153,6 @@ func resultPointCloud(pointClouds []*map[coordinate]bool) (map[coordinate]bool, 
 							y: offset.y + total_offsets[currentReferenceScanner].y,
 							z: offset.z + total_offsets[currentReferenceScanner].z,
 						}
-						fmt.Println(i, total_offsets[&cloudRotated], total_offsets[currentReferenceScanner], offset)
 						for point := range cloudPerm {
 							offsetPoint := coordinate{
 								x: point.x + total_offsets[&cloudRotated].x,
@@ -215,6 +161,7 @@ func resultPointCloud(pointClouds []*map[coordinate]bool) (map[coordinate]bool, 
 							}
 							result[offsetPoint] = true
 						}
+						break
 					}
 				}
 			}
