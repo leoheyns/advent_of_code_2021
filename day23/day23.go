@@ -44,11 +44,26 @@ type aStarState interface {
 	equals(state aStarState) bool
 }
 
-func aStar(start aStarState, goal aStarState, heuristic func(state aStarState) int) int {
+func reconstructPath(cameFrom map[aStarState]aStarState, current aStarState) []aStarState {
+	totalPath := []aStarState{current}
+	for true {
+		current = cameFrom[current]
+		totalPath = append([]aStarState{current}, totalPath...)
+		_, ok := cameFrom[current]
+		if !ok {
+			break
+		}
+	}
+	return totalPath
+}
+
+func aStar(start aStarState, goal aStarState, heuristic func(state aStarState) int) (int, map[aStarState]aStarState) {
 	var stateArray []aStarState
 	pqMap := map[aStarState]*pqIndex{}
 	openSet := priorityQueue{}
 	stateArray = append(stateArray, start)
+
+	cameFrom := map[aStarState]aStarState{}
 
 	startPqIndex := pqIndex{
 		i:        0,
@@ -70,7 +85,7 @@ func aStar(start aStarState, goal aStarState, heuristic func(state aStarState) i
 		currentState := stateArray[(*currentIndex).i]
 		delete(pqMap, currentState)
 		if currentState.equals(goal) {
-			return gScore[currentState]
+			return gScore[currentState], cameFrom
 		}
 		neighbours, distances := currentState.neighbours()
 		for _, neighbour := range neighbours {
@@ -78,7 +93,7 @@ func aStar(start aStarState, goal aStarState, heuristic func(state aStarState) i
 			nscore, ok := gScore[neighbour]
 
 			if !ok || tentativeGScore < nscore {
-				//cameFrom[neighbour] = currentState
+				cameFrom[neighbour] = currentState
 				gScore[neighbour] = tentativeGScore
 				fScore[neighbour] = tentativeGScore + heuristic(neighbour)
 				index, ok := pqMap[neighbour]
@@ -99,7 +114,7 @@ func aStar(start aStarState, goal aStarState, heuristic func(state aStarState) i
 			}
 		}
 	}
-	return -1
+	return -1, cameFrom
 }
 
 type amphipodState struct {
@@ -374,6 +389,14 @@ func main() {
 		siderooms: [4][4]string{{"A", "A", "A", "A"}, {"B", "B", "B", "B"}, {"C", "C", "C", "C"}, {"D", "D", "D", "D"}},
 		hallway:   [11]string{".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."},
 	}
-	printState(start)
-	fmt.Println(aStar(start, goal, heur))
+	//printState(start)
+	dist, camefrom := aStar(start, goal, heur)
+	path := reconstructPath(camefrom, goal)
+	fmt.Println(dist)
+	//fmt.Println(len(path))
+	for _, state := range path {
+		fmt.Println("------------------------")
+		printState(state.(amphipodState))
+		fmt.Println()
+	}
 }
