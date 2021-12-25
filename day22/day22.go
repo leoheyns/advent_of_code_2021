@@ -121,7 +121,6 @@ func main() {
 
 		if stopAt == -1 {
 			if cube.minx > 50 || cube.maxx < -50 || cube.miny > 50 || cube.maxy < -50 || cube.minz > 50 || cube.maxz < -50 {
-				fmt.Println(cube)
 				stopAt = i
 			}
 		}
@@ -139,6 +138,13 @@ func main() {
 			newResult = append(newResult, cube)
 		}
 		result = newResult
+		if i == (stopAt - 1) {
+			onCount := 0
+			for _, cube := range result {
+				onCount += (cube.maxx - cube.minx) * (cube.maxy - cube.miny) * (cube.maxz - cube.minz)
+			}
+			fmt.Println(onCount)
+		}
 	}
 	onCount := 0
 	for _, cube := range result {
@@ -146,26 +152,26 @@ func main() {
 	}
 	fmt.Println(onCount)
 
-	//part1
-
-	result = []cuboid{}
-	for i := 0; i < stopAt; i++ {
-		cube := cuboids[i]
-		//fmt.Println(cube)
-		newResult := []cuboid{}
-
-		for _, resultCube := range result {
-			newResult = append(newResult, subtrackt(resultCube, cube)...)
-		}
-		if modes[i] == "on" {
-			newResult = append(newResult, cube)
-		}
-		result = newResult
-	}
-	onCount = 0
-	for _, cube := range result {
-		onCount += (cube.maxx - cube.minx) * (cube.maxy - cube.miny) * (cube.maxz - cube.minz)
-	}
-	fmt.Println(onCount)
+	////part1
+	//
+	//result = []cuboid{}
+	//for i := 0; i < stopAt; i++ {
+	//	cube := cuboids[i]
+	//	//fmt.Println(cube)
+	//	newResult := []cuboid{}
+	//
+	//	for _, resultCube := range result {
+	//		newResult = append(newResult, subtrackt(resultCube, cube)...)
+	//	}
+	//	if modes[i] == "on" {
+	//		newResult = append(newResult, cube)
+	//	}
+	//	result = newResult
+	//}
+	//onCount = 0
+	//for _, cube := range result {
+	//	onCount += (cube.maxx - cube.minx) * (cube.maxy - cube.miny) * (cube.maxz - cube.minz)
+	//}
+	//fmt.Println(onCount)
 
 }
